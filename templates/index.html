@@ -134,6 +134,16 @@
             "ENTJ": { strength: "결단력과 통솔력", weakness: "과정보다 결과를 중시하는 성급함", behavior: "목표를 향해 직진하는 태도" }
         };
 
+        // --- Advanced Logic: Ship-shin (Ten Gods) Mapping ---
+        // 2026 is Fire Year. Day Master -> Fire relationship.
+        const SHIP_SHIN_MAP = {
+            "wood": { type: "sangsik", name: "식상운(食傷)", keyword: "표현과 활동", desc: "나의 기운을 밖으로 표출하는 시기입니다. 창작, 활동, 연애에 유리합니다." },
+            "fire": { type: "bigyeop", name: "비겁운(比劫)", keyword: "경쟁과 자존감", desc: "나와 같은 세력을 만나는 시기입니다. 주체성이 강해지나 경쟁이 치열합니다." },
+            "earth": { type: "insung", name: "인성운(印星)", keyword: "문서와 후원", desc: "불이 흙을 낳듯(화생토), 나를 돕는 기운이 들어옵니다. 계약, 학업에 좋습니다." },
+            "metal": { type: "gwanseong", name: "관성운(官星)", keyword: "책임과 명예", desc: "불이 쇠를 녹이듯(화극금), 나를 극하는 기운입니다. 직장운과 명예가 따르나 압박이 심합니다." },
+            "water": { type: "jaeseong", name: "재성운(財星)", keyword: "재물과 결실", desc: "물이 불을 끄듯(수극화), 내가 지배하는 기운입니다. 노력의 대가인 재물을 취하는 시기입니다." }
+        };
+
         // --- Logic ---
         function getHanja(str) {
             if (!str) return "";
@@ -338,75 +348,133 @@
             if (!data || !data.pillars) return null;
 
             const { name, mbti, pillars, elements } = data;
-            const myDayElem = pillars.day.ganElem || 'wood';
+            const myDayElem = pillars.day.ganElem || 'wood'; // User's element
             const mbtiInfo = MBTI_TRAITS[mbti] || MBTI_TRAITS["ISTJ"];
             const myElemName = ELEMENT_NAMES[myDayElem] || "미지";
+            
+            // --- Advanced Calculation ---
+            const shipShin = SHIP_SHIN_MAP[myDayElem]; // Determine Ten Gods relationship
+            
+            // Check for Special Events (Hap/Chung)
+            const branches = [pillars.year.ji, pillars.month.ji, pillars.day.ji, pillars.time.ji];
+            // 2026 is Horse (午).
+            const hasRat = branches.some(b => b.includes('자')); // Child-Horse Clash (자오충)
+            const hasSheep = branches.some(b => b.includes('미')); // Horse-Sheep Combination (오미합)
+            const hasTigerOrDog = branches.some(b => b.includes('인') || b.includes('술')); // Fire Alliance (인오술)
+
+            let specialEventText = "";
+            let specialEventTitle = "";
+            
+            if (hasRat) {
+                specialEventTitle = "⚡ 자오충(子午冲) 발생";
+                specialEventText = "올해는 '충돌'과 '변동'의 기운이 강합니다. 당신의 사주에 있는 '쥐(Child)'와 2026년의 '말(Horse)'이 정면으로 부딪힙니다. 이는 주거지 이동, 이직, 혹은 기존 관계의 급격한 변화를 암시합니다. 변화를 두려워하기보다 능동적으로 리셋하는 계기로 삼으세요.";
+            } else if (hasTigerOrDog) {
+                specialEventTitle = "🔥 인오술 화국(火局) 형성";
+                specialEventText = "사주에 불의 기운을 돕는 글자가 있어, 2026년의 화(Fire) 기운이 폭발적으로 증폭됩니다. 추진력이 극대화되지만, 과속으로 인한 탈진이나 실수를 조심해야 합니다. 멈추지 않는 기관차와 같습니다.";
+            } else if (hasSheep) {
+                specialEventTitle = "🤝 오미 육합(六合)";
+                specialEventText = "2026년의 말(Horse)이 당신의 양(Sheep)과 합을 이루어 안정을 찾습니다. 주변의 도움을 받거나 협력 관계가 단단해지는 시기입니다. 갈등이 해소되고 평화로운 흐름이 예상됩니다.";
+            }
 
             const getMonthlyKeywords = () => {
+                // Seasonal flow adjusted by Ten Gods
                 let spring, summer, autumn, winter;
+                
+                // Spring (Wood) / Summer (Fire) / Autumn (Metal) / Winter (Water)
+                // Relationship depends on My Day Element
                 if (myDayElem === 'wood') {
-                    spring = "비견/겁재운 - 경쟁이 치열해짐"; summer = "식상운 - 활동력 폭발, 탈진 주의"; autumn = "관성운 - 직장 내 압박감 상승"; winter = "인성운 - 휴식과 문서 계약의 시기";
+                    // Spring(Wood=Bigyeop), Summer(Fire=Sangsik), Autumn(Metal=Gwan), Winter(Water=Insung)
+                    spring = "비겁운 - 동료와 경쟁하며 성장"; summer = "식상운 - 활동력 폭발, 표현의 시기"; autumn = "관성운 - 직장 내 평가와 압박"; winter = "인성운 - 휴식과 충전, 문서 계약";
                 } else if (myDayElem === 'fire') {
-                    spring = "인성운 - 귀인의 도움"; summer = "비겁운 - 자존심 대립 주의"; autumn = "재성운 - 결실을 맺는 시기"; winter = "관성운 - 명예와 책임감";
+                    spring = "인성운 - 귀인의 도움과 배움"; summer = "비겁운 - 주체성 확립, 독단 주의"; autumn = "재성운 - 노력의 결실, 재물 획득"; winter = "관성운 - 명예 상승과 책임감";
                 } else if (myDayElem === 'earth') {
-                    spring = "관성운 - 새로운 직책, 스트레스"; summer = "인성운 - 문서 취득, 학습"; autumn = "식상운 - 아이디어 표출"; winter = "재성운 - 현금 흐름 원활";
+                    spring = "관성운 - 조직 내 자리 변동"; summer = "인성운 - 자격증 취득, 문서 운"; autumn = "식상운 - 창의적 아이디어 발산"; winter = "재성운 - 금전 흐름 원활";
                 } else if (myDayElem === 'metal') {
-                    spring = "재성운 - 투자 유혹, 지출 관리"; summer = "관성운 - 승진 기회 혹은 과로"; autumn = "비겁운 - 동료와 협업"; winter = "식상운 - 창의력 발휘";
-                } else {
-                    spring = "식상운 - 새로운 시작, 표현"; summer = "재성운 - 큰 돈을 만질 기회"; autumn = "인성운 - 내실 다지기"; winter = "비겁운 - 주도권 잡기";
+                    spring = "재성운 - 투자 기회, 지출 관리"; summer = "관성운 - 승진 기회 혹은 과로"; autumn = "비겁운 - 사람들과의 협업"; winter = "식상운 - 새로운 프로젝트 시작";
+                } else { // water
+                    spring = "식상운 - 새로운 시작과 도전"; summer = "재성운 - 큰 재물을 다루는 기회"; autumn = "인성운 - 내실 다지기, 계약"; winter = "비겁운 - 주도권 잡기, 독립";
                 }
+                
                 return [
-                    { season: "봄 (2~4월)", text: spring, detail: "새로운 싹이 트는 시기이나, 2026년의 봄은 불씨를 머금고 있습니다. 시작부터 너무 무리하지 마세요." },
-                    { season: "여름 (5~7월)", text: summer, detail: "병오년의 화기가 절정에 달합니다. 성과가 가장 뚜렷하지만 감정 기복 또한 가장 심한 시기입니다." },
-                    { season: "가을 (8~10월)", text: autumn, detail: "뜨거웠던 열기가 식고 결실이 단단해집니다. 상반기에 벌려놓은 일을 정리하고 수확해야 합니다." },
-                    { season: "겨울 (11~1월)", text: winter, detail: "수(Water) 기운이 들어와 화기를 식혀줍니다. 다음 해를 위한 재충전과 냉철한 판단이 필요합니다." }
+                    { season: "봄 (2~4월)", text: spring, detail: "새로운 기운이 싹트는 시기입니다. 2026년의 시작을 알리는 신호탄을 어떻게 쏘아올릴지 결정하세요." },
+                    { season: "여름 (5~7월)", text: summer, detail: "병오년의 화기(Fire)가 가장 강력해지는 구간입니다. 당신의 사주 흐름에서 가장 역동적인 사건이 발생할 것입니다." },
+                    { season: "가을 (8~10월)", text: autumn, detail: "뜨거운 열기가 식어가며 결과가 드러납니다. 상반기에 벌려놓은 일들을 수확하고 정리하는 시기입니다." },
+                    { season: "겨울 (11~1월)", text: winter, detail: "다음 해를 준비하며 에너지를 비축해야 합니다. 냉철한 판단력으로 한 해를 복기하세요." }
                 ];
             };
 
             const getDetailedAdvice = (topic) => {
                 let context = "", conflict = "", mbtiReaction = "", solution = "";
+                const tenGod = shipShin; // {type, name, keyword, desc}
 
                 if (topic === "total") {
-                    context = `2026년 병오년(丙午年)은 '붉은 말'의 해로, 하늘과 땅이 모두 불타오르는 형국입니다. 당신의 중심 기운인 '${myElemName}'에게 이 강력한 화(Fire) 에너지는 피할 수 없는 거대한 파도와 같습니다. `;
-                    if (myDayElem === 'water') {
-                        context += "당신은 물(Water)의 기운을 타고나, 이 뜨거운 불길을 다스려야 하는 운명입니다. 불은 당신에게 '재물'이자 '결과물'을 의미합니다. 올해는 감당하기 벅찰 만큼 큰 기회가 찾아옵니다.";
-                        conflict = "하지만 물이 적고 불이 너무 강하면, 물이 증발해버리듯 당신의 정신적 에너지가 고갈될 위험이 큽니다. '돈을 벌다가 건강을 잃는' 전형적인 해가 될 수도 있습니다.";
-                    } else if (myDayElem === 'metal') {
-                        context += "당신은 금(Metal)의 기운입니다. 불은 금을 녹여 도구를 만듭니다. 올해는 당신을 단련시키는 시련과 성장의 시기입니다. 직장이나 조직에서의 압박이 거세집니다.";
-                        conflict = "스스로를 극한까지 몰아붙이게 되며, 이는 엄청난 성과로 이어질 수도 있지만, 자칫하면 부러지거나 녹아내릴 수 있습니다. 신경성 스트레스를 조심해야 합니다.";
-                    } else if (myDayElem === 'fire') {
-                        context += "당신 또한 불(Fire)입니다. 불이 불을 만나니 경쟁자가 넘쳐나고 자존심 대결이 치열해집니다. 친구이자 적이 공존하는 시기입니다.";
-                        conflict = "내 몫을 나누어야 하는 상황이 오거나, 독단적인 결정으로 고립될 수 있습니다. 주변의 조언이 귀에 들어오지 않는 것이 가장 큰 문제입니다.";
-                    } else if (myDayElem === 'wood') {
-                        context += "당신은 나무(Wood)입니다. 불을 생(生)해주는 역할을 하니, 당신의 재능과 아이디어가 세상 밖으로 쏟아져 나오는 해입니다.";
-                        conflict = "하지만 땔감이 다 타버리면 재만 남듯, 자신의 모든 것을 태워 남 좋은 일만 시킬 수 있습니다. 실속을 챙기는 것이 관건입니다.";
-                    } else { 
-                        context += "당신은 흙(Earth)입니다. 불은 흙을 단단하게 만듭니다. 주변의 지지와 후원을 받아 문서를 잡거나 자격증을 따기에 최적의 시기입니다.";
-                        conflict = "생각이 너무 많아져 게을러질 수 있습니다. 뜨거운 땅은 물이 없으면 생명이 자라지 못하듯, 융통성이 없어 답답하다는 평가를 받을 수 있습니다.";
+                    context = `2026년 병오년은 당신에게 **'${tenGod.name}'**의 해입니다. 이는 **${tenGod.keyword}**이(가) 인생의 중심 테마가 됨을 의미합니다. ${tenGod.desc}`;
+                    if (specialEventTitle) {
+                        context += `\n\n또한 사주 원국에서 **[${specialEventTitle}]** 현상이 발견되었습니다. ${specialEventText}`;
                     }
-                    mbtiReaction = `여기에 당신의 MBTI인 ${mbti} 성향을 더해보면, 당신은 ${mbtiInfo.behavior}하는 경향이 있습니다. 특히 스트레스 상황에서 '${mbtiInfo.weakness}'하는 단점이 2026년의 강한 에너지와 충돌할 가능성이 높습니다.`;
-                    solution = `[예언자의 조언]\n운명의 흐름은 거세지만 키는 당신이 쥐고 있습니다. ${mbti.includes('J') ? '계획에 너무 집착하지 말고 변화의 파도를 타십시오.' : '즉흥적인 결정보다는 한 번 더 멈추어 생각하는 인내심이 필요합니다.'} 올해는 '속도'보다는 '방향'입니다. 당신이 가진 '${mbtiInfo.strength}'을(를) 방패 삼아 나아가세요.`;
+                    
+                    conflict = `운세의 에너지가 강한 만큼 부작용도 따릅니다. '${tenGod.keyword}'에 너무 몰입하여 균형을 잃을 수 있습니다. `;
+                    if (tenGod.type === 'bigyeop') conflict += "자존심이 강해져 주변과 마찰이 생길 수 있습니다.";
+                    else if (tenGod.type === 'sangsik') conflict += "말 실수가 따르거나 체력이 고갈될 수 있습니다.";
+                    else if (tenGod.type === 'jaeseong') conflict += "재물을 쫓다 건강이나 인간관계를 놓칠 수 있습니다.";
+                    else if (tenGod.type === 'gwanseong') conflict += "과도한 업무와 책임감으로 스트레스가 극에 달할 수 있습니다.";
+                    else if (tenGod.type === 'insung') conflict += "생각만 하다가 행동하지 않고 게을러질 수 있습니다.";
+
+                    mbtiReaction = `당신의 MBTI 유형인 **${mbti}**는 **${mbtiInfo.behavior}**하는 경향이 있죠. 2026년의 거센 흐름 속에서 스트레스를 받으면 **'${mbtiInfo.weakness}'**하는 단점이 드러나 상황을 악화시킬 수 있습니다.`;
+                    
+                    solution = `[예언자의 조언]\n운명은 파도와 같고, 당신은 서퍼입니다. 2026년이라는 파도의 높이는 높지만, 당신의 **'${mbtiInfo.strength}'**을(를) 보드 삼아 탄다면 멋지게 넘어설 수 있습니다. ${mbti.includes('J') ? '유연함을 기르세요.' : '끈기를 가지세요.'} 올해는 당신이 주도권을 쥐어야 합니다.`;
+                
                 } else if (topic === "wealth") {
-                    context = "올해의 재물운은 매우 역동적입니다. 정해진 월급보다는 투자, 성과급, 혹은 부업 등 변동성 자산의 흐름이 강합니다. 돈이 들어오는 속도만큼 나가는 속도도 빠를 것입니다.";
-                    conflict = "특히 '한 방'을 노리고 싶은 유혹이 강해집니다. 사주상 재물 창고가 열려있으나, 도둑도 함께 문 앞에 서 있는 형국입니다.";
-                    mbtiReaction = mbti.includes('P') ? `당신의 ${mbti} 성향은 충동적인 지출이나 투자에 취약합니다. 기분이 좋아서 한턱 내거나, 감에 의존한 투자를 할 위험이 매우 큽니다.` : `당신의 ${mbti} 성향은 너무 신중하여 눈앞의 기회를 놓칠 수 있습니다. 하지만 올해만큼은 돌다리도 두드려보고 건너지 않는 것이 나을 수 있습니다.`;
-                    solution = "현금보다는 묶어두는 자산(부동산, 적금)으로 변경하십시오. 올해는 '버는 것'보다 '지키는 것'이 곧 수익률입니다.";
+                    if (tenGod.type === 'jaeseong') {
+                        context = "재물운이 정점에 달하는 시기입니다. 노력한 만큼, 혹은 그 이상의 보상이 따릅니다. 투자의 감각이 예리해집니다.";
+                        conflict = "하지만 '물 들어올 때 노 젓는다'는 생각에 무리한 투자를 하거나, 소비가 걷잡을 수 없이 커질 수 있습니다.";
+                    } else if (tenGod.type === 'bigyeop') {
+                        context = "돈이 들어오지만 나갈 곳도 많습니다. 형제, 동료, 친구들과 돈을 나누거나 경쟁해야 하는 상황이 생깁니다.";
+                        conflict = "보증이나 돈 거래는 절대 금물입니다. 사람을 믿었다가 재물을 잃을 수 있는 운입니다.";
+                    } else {
+                        context = "재물보다는 명예나 문서가 중요한 해입니다. 현금 흐름은 평이하나, 자산 가치는 변동이 있을 수 있습니다.";
+                        conflict = "당장 손에 쥐어지는 현금이 적어 조급해질 수 있습니다.";
+                    }
+                    mbtiReaction = mbti.includes('P') ? `즉흥적인 ${mbti}의 성향상 충동구매나 기분파 지출을 특히 경계해야 합니다.` : `계획적인 ${mbti}라도 올해는 예상치 못한 지출에 당황할 수 있습니다. 비상금을 확보하세요.`;
+                    solution = "올해는 '공격적인 투자'보다는 '방어적인 저축'이 유리할 수 있습니다. 특히 문서(부동산, 주식) 형태로 묶어두는 것이 현명합니다.";
+
                 } else if (topic === "career") {
-                    context = "직장과 사업에서는 '이동'과 '변화'가 키워드입니다. 가만히 있고 싶어도 주변 환경이 당신을 움직이게 만듭니다. 부서 이동, 이직, 혹은 새로운 프로젝트를 맡게 됩니다.";
-                    conflict = "책임감이 무거워지는 해입니다. 능력을 인정받을 기회이지만, 그만큼의 희생을 강요받을 수 있습니다. 상사나 조직과의 갈등수도 보입니다.";
-                    mbtiReaction = mbti.includes('T') ? `논리적인 해결책을 제시하려다 동료들에게 '차가운 사람'으로 오해받을 수 있습니다. ${mbti} 특유의 직설화법이 불난 집에 부채질을 할 수 있습니다.` : `관계에서의 갈등을 피하려다 혼자 끙끙 앓을 수 있습니다. 거절하지 못하는 ${mbti}의 성향이 업무 과중을 부를 수 있습니다.`;
-                    solution = "올해는 '겸손'이 최고의 무기입니다. 능력을 드러내되 공은 타인에게 돌리십시오. 그것이 결국 더 큰 보상으로 돌아올 것입니다.";
+                    if (tenGod.type === 'gwanseong') {
+                        context = "승진, 취업, 합격운이 매우 강합니다. 조직에서 능력을 인정받고 리더의 자리에 오를 기회가 옵니다.";
+                        conflict = "왕관의 무게를 견뎌야 합니다. 업무 강도가 세지고 상사의 압박이 심해질 수 있습니다.";
+                    } else if (tenGod.type === 'sangsik') {
+                        context = "직장 생활보다는 내 사업이나 프리랜서 활동, 혹은 이직을 꿈꾸게 됩니다. 창의적인 아이디어가 샘솟습니다.";
+                        conflict = "기존 질서에 반항하고 싶은 마음이 커져 상사와 충돌할 수 있습니다. '하극상'을 조심하세요.";
+                    } else {
+                        context = "현재의 자리를 지키며 내실을 다지는 시기입니다. 큰 변동보다는 안정을 추구하는 것이 좋습니다.";
+                        conflict = "지루함을 느낄 수 있습니다. 반복되는 일상에 매너리즘이 올 수 있습니다.";
+                    }
+                    mbtiReaction = mbti.includes('T') ? `일 중심적인 ${mbti} 성향이 성과를 내는 데는 유리하지만, 인간관계를 놓쳐 적을 만들 수 있습니다.` : `관계 중심적인 ${mbti} 성향이 조직 생활에 윤활유가 되지만, 거절을 못해 이용당할 수 있습니다.`;
+                    solution = "능력은 드러내되, 공은 동료에게 돌리십시오. 올해의 평판이 향후 3년을 좌우합니다.";
+
                 } else if (topic === "love") {
-                    context = "2026년은 도화살(인기운)이 강하게 작용하는 해입니다. 당신의 매력이 밖으로 드러나며, 새로운 인연이 닿을 기회가 많습니다.";
-                    conflict = "하지만 화려한 겉모습에 비해 실속이 없을 수 있습니다. 짧고 강렬한 만남이 반복되거나, 이미 연인이 있다면 감정 싸움이 잦아질 수 있습니다.";
-                    mbtiReaction = mbti.includes('E') ? "너무 많은 사람을 만나 에너지가 분산될 수 있습니다. 깊이 있는 관계보다는 가벼운 만남에 치중할 위험이 있습니다." : "속마음을 표현하지 않아 상대방을 답답하게 할 수 있습니다. 혼자만의 동굴로 들어가는 ${mbti}의 습관이 이별을 부를 수 있습니다.";
-                    solution = "보여지는 조건보다는 대화가 통하는지에 집중하십시오. 올해 만나는 인연은 당신의 인생 가치관을 바꿀 수 있는 사람입니다.";
+                    if (tenGod.type === 'jaeseong' || tenGod.type === 'gwanseong') {
+                        context = "이성운이 매우 좋습니다. 남성에게는 재성(여성), 여성에게는 관성(남성)이 들어오는 해입니다. 결혼이나 진지한 만남이 가능합니다.";
+                        conflict = "인기가 많아지는 만큼 구설수에 오르거나, 양다리 등 복잡한 관계에 얽힐 수 있습니다.";
+                    } else if (tenGod.type === 'sangsik') {
+                        context = "나의 매력을 발산하는 시기입니다. 적극적으로 표현하니 연애 기회가 늘어납니다.";
+                        conflict = "하지만 맺고 끊음이 확실하지 않아 오해를 살 수 있습니다. 감정 기복이 심해질 수 있습니다.";
+                    } else {
+                        context = "연애보다는 나의 일이나 취미가 더 즐거운 시기입니다. 자연스러운 만남을 기대하세요.";
+                        conflict = "연인이 있다면 소홀해지기 쉬워 다툼이 예상됩니다.";
+                    }
+                    mbtiReaction = mbti.includes('E') ? "너무 많은 모임과 만남이 오히려 진정한 인연을 가릴 수 있습니다." : "집에만 있으려는 ${mbti}의 성향을 이겨내고 밖으로 나가야 운을 만날 수 있습니다.";
+                    solution = "화려한 겉모습보다 대화가 통하는지 확인하세요. 올해 만나는 사람은 당신의 가치관을 공유할 수 있는 사람이어야 합니다.";
+                
                 } else if (topic === "health") {
-                    context = "불기운이 강하면 상대적으로 수(Water)와 금(Metal) 기운이 약해집니다. 이는 신장, 방광, 폐, 호흡기 계통의 약화를 의미합니다.";
-                    conflict = "또한 화기(Fire)는 심장과 혈관을 의미하므로, 혈압 관리나 욱하는 성격으로 인한 화병을 주의해야 합니다. 수면 부족이 만병의 근원이 될 수 있습니다.";
-                    mbtiReaction = "스트레스를 받으면 ${mbtiInfo.weakness}하는 경향이 있군요. 이것이 올해 건강을 해치는 주범이 될 것입니다.";
-                    solution = "반드시 물을 많이 마시고, 땀을 흘리는 유산소 운동보다는 명상이나 요가처럼 열을 내리는 정적인 활동이 필요합니다. 밤 11시 전에는 반드시 잠자리에 드십시오.";
+                    context = "화(Fire) 기운이 강한 해이므로, 심장, 혈압, 눈 건강에 유의해야 합니다. 열이 위로 솟구치는 증상이 나타날 수 있습니다.";
+                    if (myDayElem === 'water') context += " 특히 수(Water) 기운이 약한 당신은 신장과 방광 계통을 신경 써야 합니다.";
+                    if (myDayElem === 'metal') context += " 특히 금(Metal) 기운이 약한 당신은 폐와 호흡기, 피부 트러블을 조심하세요.";
+                    conflict = "스트레스로 인한 화병이나 불면증이 올 수 있습니다.";
+                    mbtiReaction = `스트레스를 받으면 ${mbtiInfo.weakness}하는 습관이 건강을 해칠 수 있습니다.`;
+                    solution = "물(Water)을 가까이 하세요. 수영이나 반신욕이 좋으며, 붉은색 음식보다는 검은색(콩, 깨) 음식을 섭취하여 균형을 맞추세요.";
                 }
+
                 return { context, conflict, mbtiReaction, solution };
             };
 
@@ -440,7 +508,7 @@
                 const advice = getDetailedAdvice(activeTab);
                 return (
                     <div className="space-y-6 text-green-50 animate-fadeIn text-justify">
-                        <section><h4 className="text-green-400 text-sm font-bold uppercase tracking-wider mb-2">The Flow (운세의 흐름)</h4><p className="font-light leading-7 opacity-90">{advice.context}</p></section>
+                        <section><h4 className="text-green-400 text-sm font-bold uppercase tracking-wider mb-2">The Flow (운세의 흐름)</h4><p className="font-light leading-7 opacity-90 whitespace-pre-wrap">{advice.context}</p></section>
                         <section className="bg-red-900/10 p-4 rounded-lg border border-red-500/10"><h4 className="text-red-300 text-sm font-bold uppercase tracking-wider mb-2">Conflict (위기와 갈등)</h4><p className="font-light leading-7 opacity-90">{advice.conflict}</p></section>
                         <section><h4 className="text-blue-300 text-sm font-bold uppercase tracking-wider mb-2">Your Tendency ({mbti} 분석)</h4><p className="font-light leading-7 opacity-90">{advice.mbtiReaction}</p></section>
                         <section className="bg-green-500/10 p-5 rounded-xl border border-green-500/30"><h4 className="text-green-300 text-sm font-bold uppercase tracking-wider mb-2">Oracle's Solution (행동 지침)</h4><p className="font-medium leading-7 text-green-50">{advice.solution}</p></section>
@@ -508,4 +576,5 @@
     </script>
 </body>
 </html>
+
 
