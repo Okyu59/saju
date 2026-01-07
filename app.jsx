@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
 // --- Styles (CSS-in-JS injection for custom animations) ---
+
 const globalStyles = `
   @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;500;700&family=Pretendard:wght@300;400;600&display=swap');
 
