@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Oracle: 2026 Destiny Analysis</title>
+    
+    <!-- React & Tailwind CDN -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script crossorigin src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;500;700&family=Pretendard:wght@300;400;600&display=swap');
+
+        body {
+            background-color: #050505;
+            color: #e0ffe0;
+            font-family: 'Pretendard', sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        .font-serif { font-family: 'Noto Serif KR', serif; }
+
+        /* Glassmorphism */
+        .glass-panel {
+            background: rgba(20, 30, 20, 0.65);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(100, 255, 150, 0.15);
+            box-shadow: 0 8px 32px 0 rgba(0, 20, 10, 0.5);
+        }
+
+        .glass-input {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(100, 255, 150, 0.2);
+            color: #ccffcc;
+        }
+        .glass-input:focus {
+            outline: none;
+            border-color: #00ff88;
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
+        }
+
+        .glass-btn {
+            background: linear-gradient(135deg, rgba(0, 255, 136, 0.1) 0%, rgba(0, 100, 50, 0.2) 100%);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .glass-btn:hover {
+            background: linear-gradient(135deg, rgba(0, 255, 136, 0.3) 0%, rgba(0, 100, 50, 0.4) 100%);
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.4);
+            transform: translateY(-2px);
+        }
+
+        /* Animations */
+        .aurora-bg {
+            position: fixed;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at center, rgba(0, 255, 136, 0.08), transparent 40%),
+                        radial-gradient(circle at 80% 20%, rgba(0, 100, 255, 0.05), transparent 40%);
+            animation: rotate 20s linear infinite;
+            z-index: -1;
+            pointer-events: none;
+        }
+        @keyframes rotate { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        .fade-in { animation: fadeIn 0.8s ease-in forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .glow-text { text-shadow: 0 0 10px rgba(0, 255, 136, 0.7); }
+
+        .orb {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, rgba(200, 255, 220, 0.8), rgba(0, 255, 136, 0.4), rgba(0, 50, 20, 0));
+            box-shadow: 0 0 60px rgba(0, 255, 136, 0.5);
+            animation: float 6s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0) scale(1); filter: hue-rotate(0deg); }
+            50% { transform: translateY(-20px) scale(1.05); filter: hue-rotate(20deg); }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #050505; }
+        ::-webkit-scrollbar-thumb { background: #005533; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #00ff88; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        // --- Constants ---
+        const CELESTIAL_STEMS = ["갑(甲)", "을(乙)", "병(丙)", "정(丁)", "무(戊)", "기(己)", "경(庚)", "신(辛)", "임(壬)", "계(癸)"];
+        const EARTHLY_BRANCHES = ["자(子)", "축(丑)", "인(寅)", "묘(卯)", "진(辰)", "사(巳)", "오(午)", "미(未)", "신(申)", "유(酉)", "술(戌)", "해(亥)"];
+        const FIVE_ELEMENTS = {
+            "甲": "wood", "乙": "wood", "寅": "wood", "卯": "wood",
+            "丙": "fire", "丁": "fire", "巳": "fire", "午": "fire",
+            "戊": "earth", "己": "earth", "辰": "earth", "戌": "earth", "丑": "earth", "未": "earth",
+            "庚": "metal", "辛": "metal", "申": "metal", "酉": "metal",
+            "壬": "water", "癸": "water", "亥": "water", "子": "water"
+        };
+        const ELEMENT_NAMES = { wood: "목(木)", fire: "화(火)", earth: "토(土)", metal: "금(金)", water: "수(水)" };
+        const MBTI_TYPES = ["ISTJ", "ISFJ", "INFJ", "INTJ", "ISTP", "ISFP", "INFP", "INTP", "ESTP", "ESFP", "ENFP", "ENTP", "ESTJ", "ESFJ", "ENFJ", "ENTJ"];
+        const MBTI_TRAITS = {
+            "ISTJ": { strength: "책임감과 철저함", weakness: "예기치 못한 변화에 대한 스트레스", behavior: "계획대로 진행하려는 성향" },
+            "ISFJ": { strength: "성실함과 배려심", weakness: "거절하지 못해 쌓이는 피로", behavior: "타인을 돕느라 자신을 희생하는 경향" },
+            "INFJ": { strength: "깊은 통찰력과 직관", weakness: "현실적인 실행력 부족", behavior: "의미를 찾기 위해 깊게 고민하는 태도" },
+            "INTJ": { strength: "거시적인 전략적 사고", weakness: "타인의 감정에 대한 무관심", behavior: "효율성을 위해 감정을 배제하는 성향" },
+            "ISTP": { strength: "상황 적응력과 기술", weakness: "지루함을 못 견디는 충동성", behavior: "즉흥적으로 문제를 해결하려는 성향" },
+            "ISFP": { strength: "온화함과 예술적 감각", weakness: "갈등 상황 회피", behavior: "현재의 감정에 충실한 태도" },
+            "INFP": { strength: "순수한 열정과 창의성", weakness: "현실적인 경제 관념 부족", behavior: "자신의 가치관에 따라 움직이는 성향" },
+            "INTP": { strength: "논리적 분석력", weakness: "실행보다 생각이 너무 많음", behavior: "이론적 완벽함을 추구하는 태도" },
+            "ESTP": { strength: "대담함과 행동력", weakness: "장기적인 안목 부족", behavior: "위험을 감수하고 뛰어드는 성향" },
+            "ESFP": { strength: "낙천성과 사교성", weakness: "진지한 상황에서의 집중력 부족", behavior: "즐거움을 최우선으로 두는 태도" },
+            "ENFP": { strength: "풍부한 상상력과 열정", weakness: "마무리가 약하고 산만함", behavior: "새로운 가능성에 쉽게 흥분하는 성향" },
+            "ENTP": { strength: "독창성과 논쟁 즐김", weakness: "반복적인 업무에 대한 싫증", behavior: "기존 체계에 도전하는 태도" },
+            "ESTJ": { strength: "강력한 리더십과 추진력", weakness: "융통성 없는 완고함", behavior: "체계와 질서를 확립하려는 성향" },
+            "ESFJ": { strength: "협동심과 사교력", weakness: "비판에 대한 과도한 상처", behavior: "조화를 위해 노력하는 태도" },
+            "ENFJ": { strength: "카리스마와 공감 능력", weakness: "타인의 문제에 지나친 개입", behavior: "타인을 이끌고 성장시키려는 성향" },
+            "ENTJ": { strength: "결단력과 통솔력", weakness: "과정보다 결과를 중시하는 성급함", behavior: "목표를 향해 직진하는 태도" }
+        };
+
+        // --- Logic ---
+        function getHanja(str) {
+            if (!str) return "";
+            const match = str.match(/\((.)\)/);
+            return match ? match[1] : "";
+        }
+
+        function isBeforeIpchun(year, month, day) {
+            if (month < 2) return true;
+            if (month === 2 && day < 4) return true;
+            return false;
+        }
+
+        function calculateSaju(birthDate, birthTime, gender, location) {
+            const date = new Date(birthDate);
+            if (isNaN(date.getTime())) throw new Error("날짜 형식이 올바르지 않습니다.");
+
+            let year = date.getFullYear();
+            const month = date.getMonth() + 1;
+            const day = date.getDate();
+            const [hour, minute] = birthTime.split(':').map(Number);
+
+            let sajuYear = year;
+            if (isBeforeIpchun(year, month, day)) sajuYear = year - 1;
+            
+            const yearGanIndex = (sajuYear - 4) % 10;
+            const yearJiIndex = (sajuYear - 4) % 12;
+
+            const refDate = new Date('1900-01-01T00:00:00');
+            const targetDate = new Date(year, month - 1, day);
+            const diffTime = Math.abs(targetDate - refDate);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+            
+            let totalDays = diffDays + 10; 
+            let dayGanIndex = totalDays % 10;
+            let dayJiIndex = totalDays % 12;
+
+            let totalMinutes = hour * 60 + minute;
+            if (location === "Seoul") totalMinutes -= 32; 
+            else if (location === "Busan") totalMinutes -= 28; 
+
+            if (totalMinutes < 0) totalMinutes += 1440;
+            
+            let timeJiIndex = -1;
+            let isNextDay = false;
+            
+            if (totalMinutes >= 1410 || totalMinutes < 90) { 
+                timeJiIndex = 0; 
+                if (totalMinutes >= 1410) {
+                    dayGanIndex = (dayGanIndex + 1) % 10;
+                    dayJiIndex = (dayJiIndex + 1) % 12;
+                    isNextDay = true;
+                }
+            } else {
+                timeJiIndex = Math.floor((totalMinutes - 90) / 120) + 1;
+            }
+
+            const dayGanMod = dayGanIndex % 5;
+            const timeGanStart = dayGanMod * 2; 
+            const timeGanIndex = (timeGanStart + timeJiIndex) % 10;
+            
+            let sajuMonth = month;
+            if (day < 6) sajuMonth -= 1;
+            if (sajuMonth < 1) sajuMonth = 12;
+
+            const yearGanMod = yearGanIndex % 5;
+            const monthGanStart = (yearGanMod * 2 + 2) % 10;
+            let monthGanIndex = (monthGanStart + (sajuMonth - 2)) % 10;
+            if (monthGanIndex < 0) monthGanIndex += 10;
+            const finalMonthJiIndex = (sajuMonth) % 12;
+
+            const createPillar = (ganIdx, jiIdx) => {
+                const ganStr = CELESTIAL_STEMS[ganIdx];
+                const jiStr = EARTHLY_BRANCHES[jiIdx];
+                const ganHanja = getHanja(ganStr);
+                const jiHanja = getHanja(jiStr);
+                return {
+                    gan: ganStr, ji: jiStr,
+                    ganElem: FIVE_ELEMENTS[ganHanja] || "wood", 
+                    jiElem: FIVE_ELEMENTS[jiHanja] || "wood"
+                };
+            };
+
+            return {
+                year: createPillar(yearGanIndex, yearJiIndex),
+                month: createPillar((monthGanIndex + 10)%10, finalMonthJiIndex),
+                day: createPillar(dayGanIndex, dayJiIndex),
+                time: createPillar(timeGanIndex, timeJiIndex),
+                isYaJaSi: isNextDay
+            };
+        }
+
+        function analyzeElements(pillars) {
+            const counts = { wood: 0, fire: 0, earth: 0, metal: 0, water: 0 };
+            const list = [pillars.year, pillars.month, pillars.day, pillars.time];
+            list.forEach(p => {
+                if (counts[p.ganElem] !== undefined) counts[p.ganElem]++;
+                if (counts[p.jiElem] !== undefined) counts[p.jiElem]++;
+            });
+            return counts;
+        }
+
+        // --- Components ---
+
+        const IntroScreen = ({ onStart }) => (
+            <div className="flex flex-col items-center justify-center h-screen text-center px-4 fade-in z-10 relative">
+                <div className="orb mb-8"></div>
+                <h1 className="text-4xl md:text-5xl font-serif font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-green-300 via-green-100 to-green-300 glow-text">
+                    The Oracle
+                </h1>
+                <p className="text-green-100/80 mb-8 max-w-md font-light leading-relaxed">
+                    운명은 정해진 것이 아니라, 발견하는 것입니다.<br/>
+                    당신의 사주(Time)와 성향(Type)을 통해<br/>
+                    2026년 다가올 흐름을 읽어드리겠습니다.
+                </p>
+                <button onClick={onStart} className="glass-btn px-8 py-3 rounded-full text-green-200 font-medium tracking-widest uppercase hover:text-white">
+                    미래 들여다보기
+                </button>
+            </div>
+        );
+
+        const InputScreen = ({ onSubmit }) => {
+            const [formData, setFormData] = useState({ name: '', birthDate: '', birthTime: '', location: 'Seoul', mbti: '' });
+
+            const handleChange = (e) => setFormData({...formData, [e.target.name]: e.target.value});
+            const handleSubmit = (e) => {
+                e.preventDefault();
+                if(!formData.name || !formData.birthDate || !formData.birthTime || !formData.mbti) {
+                    alert("모든 정보를 정확히 입력해주십시오.");
+                    return;
+                }
+                onSubmit(formData);
+            };
+
+            return (
+                <div className="flex flex-col items-center justify-center min-h-screen px-4 py-8 fade-in z-10 relative">
+                    <div className="glass-panel p-8 rounded-2xl w-full max-w-md">
+                        <h2 className="text-2xl font-serif text-center mb-6 text-green-300">운명의 좌표 입력</h2>
+                        <form onSubmit={handleSubmit} className="space-y-5">
+                            <div>
+                                <label className="block text-xs text-green-400/70 mb-1 uppercase tracking-wider">이름 (Nickname)</label>
+                                <input type="text" name="name" onChange={handleChange} className="glass-input w-full p-3 rounded-lg text-white" placeholder="홍길동" required />
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-xs text-green-400/70 mb-1 uppercase tracking-wider">생년월일</label>
+                                    <input type="date" name="birthDate" onChange={handleChange} className="glass-input w-full p-3 rounded-lg text-white" required />
+                                </div>
+                                <div>
+                                    <label className="block text-xs text-green-400/70 mb-1 uppercase tracking-wider">태어난 시간</label>
+                                    <input type="time" name="birthTime" onChange={handleChange} className="glass-input w-full p-3 rounded-lg text-white" required />
+                                </div>
+                            </div>
+                            <div>
+                                <label className="block text-xs text-green-400/70 mb-1 uppercase tracking-wider">태어난 지역</label>
+                                <select name="location" onChange={handleChange} className="glass-input w-full p-3 rounded-lg text-white">
+                                    <option value="Seoul">서울/경기 (표준)</option>
+                                    <option value="Busan">부산/경남 (-4분)</option>
+                                    <option value="Global">해외</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label className="block text-xs text-green-400/70 mb-1 uppercase tracking-wider">MBTI 유형</label>
+                                <div className="grid grid-cols-4 gap-2">
+                                    {MBTI_TYPES.map(type => (
+                                        <button key={type} type="button" onClick={() => setFormData({...formData, mbti: type})}
+                                            className={`p-2 rounded text-xs transition-colors ${formData.mbti === type ? 'bg-green-600 text-white shadow-[0_0_10px_#00ff88]' : 'bg-white/5 text-green-100/60 hover:bg-white/10'}`}>
+                                            {type}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                            <button type="submit" className="glass-btn w-full py-4 rounded-xl text-green-200 font-bold mt-4 tracking-widest">분석 시작</button>
+                        </form>
+                    </div>
+                </div>
+            );
+        };
+
+        const LoadingScreen = () => {
+            const [message, setMessage] = useState("별의 위치를 계산하는 중...");
+            useEffect(() => {
+                const msgs = ["생년월일의 기운을 해독하는 중...", "진태양시(眞太陽時) 오차를 보정하는 중...", "2026년 병오년(丙午年)의 화기를 분석하는 중...", "당신의 성향과 운명의 교차점을 찾는 중..."];
+                let i = 0;
+                const interval = setInterval(() => { setMessage(msgs[i]); i = (i + 1) % msgs.length; }, 1500);
+                return () => clearInterval(interval);
+            }, []);
+
+            return (
+                <div className="flex flex-col items-center justify-center h-screen fade-in z-10 relative">
+                    <div className="relative">
+                        <div className="orb w-32 h-32 animate-pulse"></div>
+                        <div className="absolute top-0 left-0 w-full h-full border-t-2 border-green-400 rounded-full animate-spin"></div>
+                    </div>
+                    <p className="mt-8 text-green-200 font-serif text-lg animate-pulse">{message}</p>
+                </div>
+            );
+        };
+
+        const ResultScreen = ({ data, onReset }) => {
+            const [activeTab, setActiveTab] = useState('total');
+            if (!data || !data.pillars) return null;
+
+            const { name, mbti, pillars, elements } = data;
+            const myDayElem = pillars.day.ganElem || 'wood';
+            const mbtiInfo = MBTI_TRAITS[mbti] || MBTI_TRAITS["ISTJ"];
+            const myElemName = ELEMENT_NAMES[myDayElem] || "미지";
+
+            const getMonthlyKeywords = () => {
+                let spring, summer, autumn, winter;
+                if (myDayElem === 'wood') {
+                    spring = "비견/겁재운 - 경쟁이 치열해짐"; summer = "식상운 - 활동력 폭발, 탈진 주의"; autumn = "관성운 - 직장 내 압박감 상승"; winter = "인성운 - 휴식과 문서 계약의 시기";
+                } else if (myDayElem === 'fire') {
+                    spring = "인성운 - 귀인의 도움"; summer = "비겁운 - 자존심 대립 주의"; autumn = "재성운 - 결실을 맺는 시기"; winter = "관성운 - 명예와 책임감";
+                } else if (myDayElem === 'earth') {
+                    spring = "관성운 - 새로운 직책, 스트레스"; summer = "인성운 - 문서 취득, 학습"; autumn = "식상운 - 아이디어 표출"; winter = "재성운 - 현금 흐름 원활";
+                } else if (myDayElem === 'metal') {
+                    spring = "재성운 - 투자 유혹, 지출 관리"; summer = "관성운 - 승진 기회 혹은 과로"; autumn = "비겁운 - 동료와 협업"; winter = "식상운 - 창의력 발휘";
+                } else {
+                    spring = "식상운 - 새로운 시작, 표현"; summer = "재성운 - 큰 돈을 만질 기회"; autumn = "인성운 - 내실 다지기"; winter = "비겁운 - 주도권 잡기";
+                }
+                return [
+                    { season: "봄 (2~4월)", text: spring, detail: "새로운 싹이 트는 시기이나, 2026년의 봄은 불씨를 머금고 있습니다. 시작부터 너무 무리하지 마세요." },
+                    { season: "여름 (5~7월)", text: summer, detail: "병오년의 화기가 절정에 달합니다. 성과가 가장 뚜렷하지만 감정 기복 또한 가장 심한 시기입니다." },
+                    { season: "가을 (8~10월)", text: autumn, detail: "뜨거웠던 열기가 식고 결실이 단단해집니다. 상반기에 벌려놓은 일을 정리하고 수확해야 합니다." },
+                    { season: "겨울 (11~1월)", text: winter, detail: "수(Water) 기운이 들어와 화기를 식혀줍니다. 다음 해를 위한 재충전과 냉철한 판단이 필요합니다." }
+                ];
+            };
+
+            const getDetailedAdvice = (topic) => {
+                let context = "", conflict = "", mbtiReaction = "", solution = "";
+
+                if (topic === "total") {
+                    context = `2026년 병오년(丙午年)은 '붉은 말'의 해로, 하늘과 땅이 모두 불타오르는 형국입니다. 당신의 중심 기운인 '${myElemName}'에게 이 강력한 화(Fire) 에너지는 피할 수 없는 거대한 파도와 같습니다. `;
+                    if (myDayElem === 'water') {
+                        context += "당신은 물(Water)의 기운을 타고나, 이 뜨거운 불길을 다스려야 하는 운명입니다. 불은 당신에게 '재물'이자 '결과물'을 의미합니다. 올해는 감당하기 벅찰 만큼 큰 기회가 찾아옵니다.";
+                        conflict = "하지만 물이 적고 불이 너무 강하면, 물이 증발해버리듯 당신의 정신적 에너지가 고갈될 위험이 큽니다. '돈을 벌다가 건강을 잃는' 전형적인 해가 될 수도 있습니다.";
+                    } else if (myDayElem === 'metal') {
+                        context += "당신은 금(Metal)의 기운입니다. 불은 금을 녹여 도구를 만듭니다. 올해는 당신을 단련시키는 시련과 성장의 시기입니다. 직장이나 조직에서의 압박이 거세집니다.";
+                        conflict = "스스로를 극한까지 몰아붙이게 되며, 이는 엄청난 성과로 이어질 수도 있지만, 자칫하면 부러지거나 녹아내릴 수 있습니다. 신경성 스트레스를 조심해야 합니다.";
+                    } else if (myDayElem === 'fire') {
+                        context += "당신 또한 불(Fire)입니다. 불이 불을 만나니 경쟁자가 넘쳐나고 자존심 대결이 치열해집니다. 친구이자 적이 공존하는 시기입니다.";
+                        conflict = "내 몫을 나누어야 하는 상황이 오거나, 독단적인 결정으로 고립될 수 있습니다. 주변의 조언이 귀에 들어오지 않는 것이 가장 큰 문제입니다.";
+                    } else if (myDayElem === 'wood') {
+                        context += "당신은 나무(Wood)입니다. 불을 생(生)해주는 역할을 하니, 당신의 재능과 아이디어가 세상 밖으로 쏟아져 나오는 해입니다.";
+                        conflict = "하지만 땔감이 다 타버리면 재만 남듯, 자신의 모든 것을 태워 남 좋은 일만 시킬 수 있습니다. 실속을 챙기는 것이 관건입니다.";
+                    } else { 
+                        context += "당신은 흙(Earth)입니다. 불은 흙을 단단하게 만듭니다. 주변의 지지와 후원을 받아 문서를 잡거나 자격증을 따기에 최적의 시기입니다.";
+                        conflict = "생각이 너무 많아져 게을러질 수 있습니다. 뜨거운 땅은 물이 없으면 생명이 자라지 못하듯, 융통성이 없어 답답하다는 평가를 받을 수 있습니다.";
+                    }
+                    mbtiReaction = `여기에 당신의 MBTI인 ${mbti} 성향을 더해보면, 당신은 ${mbtiInfo.behavior}하는 경향이 있습니다. 특히 스트레스 상황에서 '${mbtiInfo.weakness}'하는 단점이 2026년의 강한 에너지와 충돌할 가능성이 높습니다.`;
+                    solution = `[예언자의 조언]\n운명의 흐름은 거세지만 키는 당신이 쥐고 있습니다. ${mbti.includes('J') ? '계획에 너무 집착하지 말고 변화의 파도를 타십시오.' : '즉흥적인 결정보다는 한 번 더 멈추어 생각하는 인내심이 필요합니다.'} 올해는 '속도'보다는 '방향'입니다. 당신이 가진 '${mbtiInfo.strength}'을(를) 방패 삼아 나아가세요.`;
+                } else if (topic === "wealth") {
+                    context = "올해의 재물운은 매우 역동적입니다. 정해진 월급보다는 투자, 성과급, 혹은 부업 등 변동성 자산의 흐름이 강합니다. 돈이 들어오는 속도만큼 나가는 속도도 빠를 것입니다.";
+                    conflict = "특히 '한 방'을 노리고 싶은 유혹이 강해집니다. 사주상 재물 창고가 열려있으나, 도둑도 함께 문 앞에 서 있는 형국입니다.";
+                    mbtiReaction = mbti.includes('P') ? `당신의 ${mbti} 성향은 충동적인 지출이나 투자에 취약합니다. 기분이 좋아서 한턱 내거나, 감에 의존한 투자를 할 위험이 매우 큽니다.` : `당신의 ${mbti} 성향은 너무 신중하여 눈앞의 기회를 놓칠 수 있습니다. 하지만 올해만큼은 돌다리도 두드려보고 건너지 않는 것이 나을 수 있습니다.`;
+                    solution = "현금보다는 묶어두는 자산(부동산, 적금)으로 변경하십시오. 올해는 '버는 것'보다 '지키는 것'이 곧 수익률입니다.";
+                } else if (topic === "career") {
+                    context = "직장과 사업에서는 '이동'과 '변화'가 키워드입니다. 가만히 있고 싶어도 주변 환경이 당신을 움직이게 만듭니다. 부서 이동, 이직, 혹은 새로운 프로젝트를 맡게 됩니다.";
+                    conflict = "책임감이 무거워지는 해입니다. 능력을 인정받을 기회이지만, 그만큼의 희생을 강요받을 수 있습니다. 상사나 조직과의 갈등수도 보입니다.";
+                    mbtiReaction = mbti.includes('T') ? `논리적인 해결책을 제시하려다 동료들에게 '차가운 사람'으로 오해받을 수 있습니다. ${mbti} 특유의 직설화법이 불난 집에 부채질을 할 수 있습니다.` : `관계에서의 갈등을 피하려다 혼자 끙끙 앓을 수 있습니다. 거절하지 못하는 ${mbti}의 성향이 업무 과중을 부를 수 있습니다.`;
+                    solution = "올해는 '겸손'이 최고의 무기입니다. 능력을 드러내되 공은 타인에게 돌리십시오. 그것이 결국 더 큰 보상으로 돌아올 것입니다.";
+                } else if (topic === "love") {
+                    context = "2026년은 도화살(인기운)이 강하게 작용하는 해입니다. 당신의 매력이 밖으로 드러나며, 새로운 인연이 닿을 기회가 많습니다.";
+                    conflict = "하지만 화려한 겉모습에 비해 실속이 없을 수 있습니다. 짧고 강렬한 만남이 반복되거나, 이미 연인이 있다면 감정 싸움이 잦아질 수 있습니다.";
+                    mbtiReaction = mbti.includes('E') ? "너무 많은 사람을 만나 에너지가 분산될 수 있습니다. 깊이 있는 관계보다는 가벼운 만남에 치중할 위험이 있습니다." : "속마음을 표현하지 않아 상대방을 답답하게 할 수 있습니다. 혼자만의 동굴로 들어가는 ${mbti}의 습관이 이별을 부를 수 있습니다.";
+                    solution = "보여지는 조건보다는 대화가 통하는지에 집중하십시오. 올해 만나는 인연은 당신의 인생 가치관을 바꿀 수 있는 사람입니다.";
+                } else if (topic === "health") {
+                    context = "불기운이 강하면 상대적으로 수(Water)와 금(Metal) 기운이 약해집니다. 이는 신장, 방광, 폐, 호흡기 계통의 약화를 의미합니다.";
+                    conflict = "또한 화기(Fire)는 심장과 혈관을 의미하므로, 혈압 관리나 욱하는 성격으로 인한 화병을 주의해야 합니다. 수면 부족이 만병의 근원이 될 수 있습니다.";
+                    mbtiReaction = "스트레스를 받으면 ${mbtiInfo.weakness}하는 경향이 있군요. 이것이 올해 건강을 해치는 주범이 될 것입니다.";
+                    solution = "반드시 물을 많이 마시고, 땀을 흘리는 유산소 운동보다는 명상이나 요가처럼 열을 내리는 정적인 활동이 필요합니다. 밤 11시 전에는 반드시 잠자리에 드십시오.";
+                }
+                return { context, conflict, mbtiReaction, solution };
+            };
+
+            const tabs = [
+                { id: "total", title: "2026 총운", icon: "✨" }, { id: "wealth", title: "재물운", icon: "💰" },
+                { id: "career", title: "직장운", icon: "👔" }, { id: "love", title: "연애운", icon: "❤️" },
+                { id: "health", title: "건강운", icon: "🌿" }, { id: "monthly", title: "월별 흐름", icon: "📅" }
+            ];
+
+            const renderContent = () => {
+                if (activeTab === 'monthly') {
+                    const months = getMonthlyKeywords();
+                    return (
+                        <div className="space-y-4 animate-fadeIn">
+                            <h3 className="text-xl font-serif text-green-300 mb-4 border-b border-green-500/30 pb-2">2026년 병오년 계절별 흐름</h3>
+                            <div className="grid gap-4">
+                                {months.map((m, idx) => (
+                                    <div key={idx} className="bg-black/40 p-4 rounded-lg border border-green-500/10 hover:border-green-500/30 transition-colors">
+                                        <div className="flex justify-between items-center mb-2">
+                                            <span className="text-green-400 font-bold">{m.season}</span>
+                                            <span className="text-xs text-green-200/60 bg-green-900/30 px-2 py-1 rounded">{m.text.split('-')[0]}</span>
+                                        </div>
+                                        <p className="text-green-100/90 text-sm font-bold mb-1">{m.text.split('-')[1]}</p>
+                                        <p className="text-gray-400 text-xs leading-relaxed">{m.detail}</p>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    );
+                }
+                const advice = getDetailedAdvice(activeTab);
+                return (
+                    <div className="space-y-6 text-green-50 animate-fadeIn text-justify">
+                        <section><h4 className="text-green-400 text-sm font-bold uppercase tracking-wider mb-2">The Flow (운세의 흐름)</h4><p className="font-light leading-7 opacity-90">{advice.context}</p></section>
+                        <section className="bg-red-900/10 p-4 rounded-lg border border-red-500/10"><h4 className="text-red-300 text-sm font-bold uppercase tracking-wider mb-2">Conflict (위기와 갈등)</h4><p className="font-light leading-7 opacity-90">{advice.conflict}</p></section>
+                        <section><h4 className="text-blue-300 text-sm font-bold uppercase tracking-wider mb-2">Your Tendency ({mbti} 분석)</h4><p className="font-light leading-7 opacity-90">{advice.mbtiReaction}</p></section>
+                        <section className="bg-green-500/10 p-5 rounded-xl border border-green-500/30"><h4 className="text-green-300 text-sm font-bold uppercase tracking-wider mb-2">Oracle's Solution (행동 지침)</h4><p className="font-medium leading-7 text-green-50">{advice.solution}</p></section>
+                    </div>
+                );
+            };
+
+            return (
+                <div className="min-h-screen flex flex-col items-center p-4 py-8 fade-in pb-20 z-10 relative">
+                    <div className="w-full max-w-3xl flex justify-between items-center mb-6">
+                        <h2 className="text-2xl font-serif text-green-300 glow-text">The Oracle</h2>
+                        <button onClick={onReset} className="text-xs text-green-400/60 hover:text-green-300 underline underline-offset-4">처음으로 돌아가기</button>
+                    </div>
+                    <div className="glass-panel w-full max-w-3xl p-0 rounded-3xl mb-6 relative overflow-hidden flex flex-col md:flex-row min-h-[600px]">
+                        <div className="w-full md:w-24 bg-black/20 md:border-r border-b md:border-b-0 border-green-500/10 flex md:flex-col justify-around md:justify-start md:pt-8 p-2">
+                            {tabs.map((tab) => (
+                                <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`flex flex-col items-center justify-center p-3 rounded-xl transition-all mb-2 ${activeTab === tab.id ? 'bg-green-500/20 text-green-300 shadow-[0_0_15px_rgba(0,255,136,0.2)]' : 'text-gray-500 hover:text-green-200 hover:bg-white/5'}`}>
+                                    <span className="text-xl mb-1">{tab.icon}</span><span className="text-[10px] font-bold">{tab.title.split(' ')[0]}</span>
+                                </button>
+                            ))}
+                        </div>
+                        <div className="flex-1 p-6 md:p-8 overflow-y-auto max-h-[80vh]">
+                            <div className="flex items-center justify-between mb-6 border-b border-green-500/20 pb-4">
+                                <div><span className="text-xs bg-green-900/50 text-green-300 px-2 py-1 rounded border border-green-500/30">{pillars.day.gan}{pillars.day.ji}일주</span><span className="ml-2 text-xs bg-blue-900/50 text-blue-300 px-2 py-1 rounded border border-blue-500/30">{mbti}</span></div>
+                                <h2 className="text-xl font-bold text-white">{tabs.find(t => t.id === activeTab)?.title}</h2>
+                            </div>
+                            {renderContent()}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const App = () => {
+            const [gameState, setGameState] = useState('INTRO');
+            const [userData, setUserData] = useState(null);
+
+            const handleStart = () => setGameState('INPUT');
+            const handleReset = () => { setUserData(null); setGameState('INTRO'); };
+            const handleInputSubmit = (data) => {
+                setGameState('LOADING');
+                setTimeout(() => {
+                    try {
+                        const pillars = calculateSaju(data.birthDate, data.birthTime, data.gender, data.location);
+                        const elements = analyzeElements(pillars);
+                        setUserData({ ...data, pillars, elements });
+                        setGameState('RESULT');
+                    } catch (e) { alert("오류 발생: " + e.message); window.location.reload(); }
+                }, 2500);
+            };
+
+            return (
+                <div className="relative w-full min-h-screen bg-[#050505] text-[#e0ffe0] font-sans overflow-hidden selection:bg-green-500/30">
+                    <div className="aurora-bg"></div>
+                    {gameState === 'INTRO' && <IntroScreen onStart={handleStart} />}
+                    {gameState === 'INPUT' && <InputScreen onSubmit={handleInputSubmit} />}
+                    {gameState === 'LOADING' && <LoadingScreen />}
+                    {gameState === 'RESULT' && <ResultScreen data={userData} onReset={handleReset} />}
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
+
