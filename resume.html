@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Okyu Choi - Resume</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f3f4f6; /* Gray-100 */
+            font-family: 'Inter', sans-serif;
+            -webkit-print-color-adjust: exact;
+        }
+
+        /* A4 Paper Simulation */
+        .page {
+            width: 210mm;
+            min-height: 297mm;
+            padding: 15mm 20mm;
+            margin: 20px auto;
+            background: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        /* Print Styles */
+        @media print {
+            body {
+                background: white;
+                margin: 0;
+            }
+            .page {
+                width: 100%;
+                margin: 0;
+                padding: 0 10mm; /* Adjust padding for print margins */
+                box-shadow: none;
+                border: none;
+            }
+            .no-print {
+                display: none !important;
+            }
+            /* Hides browser default headers/footers if possible, 
+               but user should manually uncheck them in print dialog */
+            @page {
+                margin: 10mm 0; 
+                size: auto;
+            }
+        }
+
+        /* Typography Tweaks */
+        h1 { letter-spacing: -0.025em; }
+        h2 { letter-spacing: -0.015em; border-bottom: 2px solid #111827; padding-bottom: 4px; margin-bottom: 12px; }
+        .job-header { display: flex; justify-content: space-between; align-items: baseline; }
+        
+        /* Editable highlight */
+        [contenteditable]:hover {
+            background-color: #fef3c7;
+            cursor: text;
+            outline: none;
+        }
+        [contenteditable]:focus {
+            background-color: #fef3c7;
+            outline: none;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Control Bar (Hidden on Print) -->
+    <div class="no-print fixed top-0 left-0 w-full bg-slate-800 text-white p-4 shadow-lg z-50 flex justify-between items-center">
+        <div class="text-sm font-medium">
+            <i class="fas fa-info-circle mr-2"></i>You can click directly on the text below to edit your contact info.
+        </div>
+        <button onclick="window.print()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded shadow transition duration-200 flex items-center">
+            <i class="fas fa-file-pdf mr-2"></i> Save as PDF
+        </button>
+    </div>
+
+    <!-- Spacer for fixed header -->
+    <div class="h-20 no-print"></div>
+
+    <!-- Resume Page -->
+    <div class="page" contenteditable="true" spellcheck="false">
+        
+        <!-- Header -->
+        <header class="mb-8 border-b pb-6 border-gray-200">
+            <h1 class="text-4xl font-bold text-gray-900 mb-2">Okyu Choi</h1>
+            <p class="text-xl text-gray-600 font-medium mb-4">Product Designer / UX Designer</p>
+            
+            <div class="flex flex-wrap gap-4 text-sm text-gray-700">
+                <div class="flex items-center">
+                    <i class="fas fa-map-marker-alt w-5 text-gray-400"></i>
+                    <span>Seoul, South Korea</span>
+                </div>
+                <div class="flex items-center">
+                    <i class="fas fa-phone w-5 text-gray-400"></i>
+                    <span>+82 10-5028-2704</span>
+                </div>
+                <div class="flex items-center">
+                    <i class="fas fa-envelope w-5 text-gray-400"></i>
+                    <span>snli2001@gmail.com</span>
+                </div>
+                <div class="flex items-center">
+                    <i class="fab fa-linkedin w-5 text-gray-400"></i>
+                    <span>linkedin.com/in/okyu-choi</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Professional Summary -->
+        <section class="mb-8">
+            <h2 class="text-lg font-bold text-gray-900 uppercase tracking-wider">Professional Summary</h2>
+            <p class="text-gray-700 leading-relaxed text-justify text-sm mt-3">
+                Results-oriented Product Designer with <strong>over 7 years</strong> of experience in Fintech and Digital Healthcare. Specializes in transforming complex financial data into intuitive, user-centric interfaces, leveraging a robust background in HCI and Industrial Design. Demonstrated success in driving product growth—increasing MAU by 140k and boosting app ratings from 1.0 to 4.5 through rigorous data analysis (GA4) and iterative testing. Adept at integrating AI-driven workflows and leading cross-functional Agile teams to deliver scalable digital solutions.
+            </p>
+        </section>
+
+        <!-- Work Experience -->
+        <section class="mb-8">
+            <h2 class="text-lg font-bold text-gray-900 uppercase tracking-wider">Work Experience</h2>
+
+            <!-- Samsung Card -->
+            <div class="mb-6 mt-4">
+                <div class="job-header mb-1">
+                    <h3 class="text-md font-bold text-gray-900">Samsung Card (Samsung Financial Networks)</h3>
+                    <span class="text-sm text-gray-600 font-medium">Seoul, South Korea</span>
+                </div>
+                <div class="job-header mb-3">
+                    <span class="text-sm font-semibold text-gray-700 italic">Product Designer (Senior Associate)</span>
+                    <span class="text-sm text-gray-600">Jun 2025 – Present</span>
+                </div>
+                <ul class="list-disc list-outside ml-4 text-sm text-gray-700 leading-relaxed space-y-1.5">
+                    <li>Spearheaded the UX design for affiliate reward services ("Gathering Moni-Money"), enhancing user engagement through gamified ad-viewing experiences.</li>
+                    <li>Developed and deployed an AI-powered <strong>"UX Writing Assistant"</strong> using Samsung’s internal LLM platform, FabriX. Standardized UX copy across the organization, significantly improving operational efficiency.</li>
+                    <li>Conducted advanced UX research for the Monimo Wallet, identifying key usability improvements for future roadmap planning.</li>
+                    <li>Created a comprehensive UX Content Manual for marketers to ensure brand consistency across all customer touchpoints.</li>
+                </ul>
+            </div>
+
+            <!-- Hanwha Life -->
+            <div class="mb-6">
+                <div class="job-header mb-1">
+                    <h3 class="text-md font-bold text-gray-900">Hanwha Life Insurance</h3>
+                    <span class="text-sm text-gray-600 font-medium">Seoul, South Korea</span>
+                </div>
+                <div class="job-header mb-3">
+                    <span class="text-sm font-semibold text-gray-700 italic">Product Designer (Manager)</span>
+                    <span class="text-sm text-gray-600">Sep 2021 – Jun 2025</span>
+                </div>
+                <ul class="list-disc list-outside ml-4 text-sm text-gray-700 leading-relaxed space-y-1.5">
+                    <li>Led the major renewal of the mobile app, resulting in a <strong>140,000 increase in MAU</strong> and a dramatic improvement in App Store ratings from <strong>1.0 to 4.0 stars</strong>.</li>
+                    <li>Optimized the Insurance Claims process, increasing mobile claim submissions by <strong>8,000 (3.78% growth)</strong> and reducing monthly submission errors by <strong>500 cases</strong>.</li>
+                    <li>Implemented a "One-Task-Per-Page" principle to simplify complex insurance flows for older demographics (40s-50s).</li>
+                    <li>Leveraged GA4 and A/B testing to analyze user behavior funnels, establishing a data-driven decision-making culture within the design team.</li>
+                    <li>Formulated retention strategies based on in-depth interviews with Financial Planners (FPs) and customers.</li>
+                </ul>
+            </div>
+
+            <!-- LG CNS -->
+            <div class="mb-6">
+                <div class="job-header mb-1">
+                    <h3 class="text-md font-bold text-gray-900">LG CNS</h3>
+                    <span class="text-sm text-gray-600 font-medium">Seoul, South Korea</span>
+                </div>
+                <div class="job-header mb-3">
+                    <span class="text-sm font-semibold text-gray-700 italic">UX Designer (Senior Associate)</span>
+                    <span class="text-sm text-gray-600">Jun 2019 – Sep 2021</span>
+                </div>
+                <ul class="list-disc list-outside ml-4 text-sm text-gray-700 leading-relaxed space-y-1.5">
+                    <li>Designed and launched "Haru Jogak," a B2C MyData personal finance app. Achieved <strong>200,000 subscribers within 3 months</strong> of launch.</li>
+                    <li>Played a key role in securing the first MyData business license for a non-financial IT company in Korea through strategic platform planning.</li>
+                    <li>Designed the UX/UI for a Tagless Traffic Solution POC in Bogota, Colombia, successfully demonstrating the feasibility of the technology for the Latin American market.</li>
+                </ul>
+            </div>
+
+            <!-- NAVER -->
+            <div class="mb-6">
+                <div class="job-header mb-1">
+                    <h3 class="text-md font-bold text-gray-900">NAVER</h3>
+                    <span class="text-sm text-gray-600 font-medium">Seongnam, South Korea & Tokyo, Japan</span>
+                </div>
+                <div class="job-header mb-3">
+                    <span class="text-sm font-semibold text-gray-700 italic">UX Design Intern</span>
+                    <span class="text-sm text-gray-600">Nov 2017 – Jul 2018</span>
+                </div>
+                <ul class="list-disc list-outside ml-4 text-sm text-gray-700 leading-relaxed space-y-1.5">
+                    <li>Selected for a global internship program and <strong>dispatched to LINE Corp. (Tokyo)</strong> to execute key design projects.</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Education -->
+        <section class="mb-8">
+            <h2 class="text-lg font-bold text-gray-900 uppercase tracking-wider">Education</h2>
+            
+            <div class="mb-4 mt-4">
+                <div class="job-header">
+                    <h3 class="text-md font-bold text-gray-900">KAIST (Korea Advanced Institute of Science and Technology)</h3>
+                    <span class="text-sm text-gray-600">Daejeon, South Korea</span>
+                </div>
+                <div class="flex justify-between items-baseline">
+                    <span class="text-sm text-gray-700">Master of Science in Industrial Design (Focus on HCI)</span>
+                    <span class="text-sm text-gray-600">Feb 2019</span>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <div class="job-header">
+                    <h3 class="text-md font-bold text-gray-900">University of Tsukuba</h3>
+                    <span class="text-sm text-gray-600">Tsukuba, Japan</span>
+                </div>
+                <div class="flex justify-between items-baseline">
+                    <span class="text-sm text-gray-700">Bachelor of Arts in Product Design</span>
+                    <span class="text-sm text-gray-600">Mar 2016</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Skills & Awards Grid -->
+        <div class="grid grid-cols-2 gap-8">
+            <!-- Skills -->
+            <section>
+                <h2 class="text-lg font-bold text-gray-900 uppercase tracking-wider">Skills</h2>
+                <div class="mt-3 text-sm text-gray-700 space-y-2">
+                    <div>
+                        <span class="font-bold text-gray-900">Design:</span> Figma, Sketch, Adobe XD, ProtoPie, Adobe Creative Suite (Ps, Ai)
+                    </div>
+                    <div>
+                        <span class="font-bold text-gray-900">Research:</span> User Interviews, Usability Testing, Google Analytics (GA4), Funnel Analysis
+                    </div>
+                    <div>
+                        <span class="font-bold text-gray-900">Collaboration:</span> Agile/Scrum, Jira, Confluence
+                    </div>
+                    <div>
+                        <span class="font-bold text-gray-900">Languages:</span> Korean (Native), English (Professional), Japanese (Fluent)
+                    </div>
+                </div>
+            </section>
+
+            <!-- Awards -->
+            <section>
+                <h2 class="text-lg font-bold text-gray-900 uppercase tracking-wider">Awards & Patents</h2>
+                <ul class="mt-3 text-sm text-gray-700 space-y-2 list-none">
+                    <li>
+                        <span class="font-bold">Design Patent:</span> Food Waste Disposer (No. 3020150031824) <span class="text-gray-500 text-xs ml-1">2015</span>
+                    </li>
+                    <li>
+                        <span class="font-bold">Grand Prize</span>, LH Design Competition (Korea)
+                    </li>
+                    <li>
+                        <span class="font-bold">Gold Prize</span>, Taiwan Int'l Student Design Competition
+                    </li>
+                    <li>
+                        <span class="font-bold">Silver Prize</span>, Dongguan Int'l Design Competition
+                    </li>
+                </ul>
+            </section>
+        </div>
+
+    </div>
+
+</body>
+</html>
