@@ -7,6 +7,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- html2pdf.js Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         body {
             background-color: #f3f4f6; /* Gray-100 */
@@ -25,7 +27,7 @@
             position: relative;
         }
 
-        /* Print Styles */
+        /* Print Styles - Fallback */
         @media print {
             body {
                 background: white;
@@ -34,15 +36,13 @@
             .page {
                 width: 100%;
                 margin: 0;
-                padding: 0 10mm; /* Adjust padding for print margins */
+                padding: 0 10mm;
                 box-shadow: none;
                 border: none;
             }
             .no-print {
                 display: none !important;
             }
-            /* Hides browser default headers/footers if possible, 
-               but user should manually uncheck them in print dialog */
             @page {
                 margin: 10mm 0; 
                 size: auto;
@@ -65,6 +65,44 @@
             outline: none;
         }
     </style>
+    <script>
+        function saveAsPDF() {
+            // Select the element to be converted
+            const element = document.getElementById('resume-preview');
+            const btn = document.getElementById('save-btn');
+            const originalText = btn.innerHTML;
+
+            // Visual feedback
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Generating...';
+            btn.classList.add('opacity-75', 'cursor-not-allowed');
+
+            // Options for html2pdf
+            const opt = {
+                margin:       0,
+                filename:     'Okyu_Choi_Resume.pdf',
+                image:        { type: 'jpeg', quality: 1.0 }, // Max quality
+                html2canvas:  { scale: 2, useCORS: true, scrollY: 0 }, // Higher scale for better resolution
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            // Temporarily remove shadow for cleaner PDF output
+            const originalShadow = element.style.boxShadow;
+            element.style.boxShadow = 'none';
+
+            // Generate and save
+            html2pdf().from(element).set(opt).save().then(() => {
+                // Restore state
+                element.style.boxShadow = originalShadow;
+                btn.innerHTML = originalText;
+                btn.classList.remove('opacity-75', 'cursor-not-allowed');
+            }).catch(err => {
+                console.error(err);
+                alert('An error occurred while generating the PDF.');
+                btn.innerHTML = originalText;
+                btn.classList.remove('opacity-75', 'cursor-not-allowed');
+            });
+        }
+    </script>
 </head>
 <body>
 
@@ -73,7 +111,7 @@
         <div class="text-sm font-medium">
             <i class="fas fa-info-circle mr-2"></i>You can click directly on the text below to edit your contact info.
         </div>
-        <button onclick="window.print()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded shadow transition duration-200 flex items-center">
+        <button id="save-btn" onclick="saveAsPDF()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded shadow transition duration-200 flex items-center">
             <i class="fas fa-file-pdf mr-2"></i> Save as PDF
         </button>
     </div>
@@ -82,7 +120,7 @@
     <div class="h-20 no-print"></div>
 
     <!-- Resume Page -->
-    <div class="page" contenteditable="true" spellcheck="false">
+    <div class="page" id="resume-preview" contenteditable="true" spellcheck="false">
         
         <!-- Header -->
         <header class="mb-8 border-b pb-6 border-gray-200">
